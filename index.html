@@ -35,9 +35,15 @@
                     <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
                 <div class="mx-auto text-sm text-gray-500">CSU Multi-Guide Chat</div>
+                <div id="connection-status" class="text-sm text-gray-500">
+                    <span class="inline-flex items-center">
+                        <span id="status-indicator" class="h-2 w-2 rounded-full bg-gray-400 mr-2"></span>
+                        <span id="status-text">Verificando conexão...</span>
+                    </span>
+                </div>
             </div>
         </div>
-        <div class="chat-container p-4 overflow-y-auto">
+        <div id="chat-container" class="chat-container p-4 overflow-y-auto">
             <div class="flex mb-4">
                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -49,40 +55,11 @@
                     <p class="text-sm text-gray-800">Olá! Sou o CSU Multi-Guide. Como posso ajudar você hoje?</p>
                 </div>
             </div>
-            <div class="flex justify-end mb-4">
-                <div class="mr-3 bg-gray-100 p-3 rounded-lg rounded-tr-none max-w-md">
-                    <p class="text-sm text-gray-800">Pode me explicar como funciona a inteligência artificial?</p>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 flex-shrink-0">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="flex mb-4">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                        <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10zm0 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <div class="ml-3 bg-blue-50 p-3 rounded-lg rounded-tl-none max-w-md">
-                    <p class="text-sm text-gray-800">A inteligência artificial (IA) é um campo da ciência da computação que busca criar sistemas capazes de realizar tarefas que normalmente exigiriam inteligência humana. Esses sistemas aprendem com dados, identificam padrões e tomam decisões com mínima intervenção humana.</p>
-                    <p class="text-sm text-gray-800 mt-2">Existem vários tipos de IA, como:</p>
-                    <ul class="list-disc pl-5 mt-1 text-sm text-gray-800">
-                        <li>Aprendizado de máquina</li>
-                        <li>Processamento de linguagem natural</li>
-                        <li>Visão computacional</li>
-                        <li>Sistemas especialistas</li>
-                    </ul>
-                    <p class="text-sm text-gray-800 mt-2">Posso explicar mais sobre algum desses tópicos específicos?</p>
-                </div>
-            </div>
         </div>
         <div class="border-t border-gray-200 p-4">
             <div class="flex">
-                <input type="text" placeholder="Envie uma mensagem..." class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <button class="ml-2 bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors duration-300">
+                <input type="text" id="message-input" placeholder="Envie uma mensagem..." class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <button id="send-button" class="ml-2 bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors duration-300">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                     </svg>
@@ -195,71 +172,222 @@
         mobileMenu.classList.toggle('hidden');
     });
     
-    // Chat input functionality
-    const chatInput = document.querySelector('input[placeholder="Envie uma mensagem..."]');
-    const sendButton = chatInput.nextElementSibling;
-    const chatContainer = document.querySelector('.chat-container');
+    // Chat functionality with API integration
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const chatContainer = document.getElementById('chat-container');
+    const statusIndicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
     
-    function sendMessage() {
-        const message = chatInput.value.trim();
-        if (message) {
-            // Add user message
-            const userMessageHTML = `
-                <div class="flex justify-end mb-4">
-                    <div class="mr-3 bg-gray-100 p-3 rounded-lg rounded-tr-none max-w-md">
-                        <p class="text-sm text-gray-800">${message}</p>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 flex-shrink-0">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                </div>
-            `;
-            chatContainer.insertAdjacentHTML('beforeend', userMessageHTML);
+    // Chat history to maintain context
+    let chatHistory = [];
+    
+    // Check API connection
+    async function checkApiConnection() {
+        try {
+            const response = await fetch('http://localhost:1234/health', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
             
-            // Clear input
-            chatInput.value = '';
-            
-            // Simulate AI response after a short delay
-            setTimeout(() => {
-                const aiResponses = [
-                    "Entendi sua pergunta. Posso ajudar com isso fornecendo informações detalhadas e relevantes.",
-                    "Ótima pergunta! Vou pesquisar e fornecer a melhor resposta possível para você.",
-                    "Estou processando sua solicitação. Aqui está o que encontrei sobre esse assunto.",
-                    "Obrigado por perguntar. Deixe-me explicar isso de forma clara e concisa."
-                ];
-                
-                const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-                
-                const aiMessageHTML = `
-                    <div class="flex mb-4">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                                <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10zm0 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-3 bg-blue-50 p-3 rounded-lg rounded-tl-none max-w-md">
-                            <p class="text-sm text-gray-800">${randomResponse}</p>
-                        </div>
-                    </div>
-                `;
-                chatContainer.insertAdjacentHTML('beforeend', aiMessageHTML);
-                
-                // Scroll to bottom
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 1000);
-            
-            // Scroll to bottom
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            if (response.ok) {
+                statusIndicator.classList.remove('bg-gray-400', 'bg-red-500');
+                statusIndicator.classList.add('bg-green-500');
+                statusText.textContent = 'API Conectada';
+                return true;
+            } else {
+                throw new Error('API respondeu com erro');
+            }
+        } catch (error) {
+            statusIndicator.classList.remove('bg-gray-400', 'bg-green-500');
+            statusIndicator.classList.add('bg-red-500');
+            statusText.textContent = 'API Desconectada';
+            console.error('Erro ao conectar com a API:', error);
+            return false;
         }
     }
     
+    // Initial connection check
+    checkApiConnection();
+    
+    // Add typing indicator
+    function addTypingIndicator() {
+        const typingHTML = `
+            <div id="typing-indicator" class="flex mb-4">
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                        <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10zm0 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 bg-blue-50 p-3 rounded-lg rounded-tl-none">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatContainer.insertAdjacentHTML('beforeend', typingHTML);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Remove typing indicator
+    function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+    
+    // Add user message to chat
+    function addUserMessage(message) {
+        const userMessageHTML = `
+            <div class="flex justify-end mb-4">
+                <div class="mr-3 bg-gray-100 p-3 rounded-lg rounded-tr-none max-w-md">
+                    <p class="text-sm text-gray-800">${escapeHtml(message)}</p>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 flex-shrink-0">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+        `;
+        chatContainer.insertAdjacentHTML('beforeend', userMessageHTML);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // Add to history
+        chatHistory.push({ role: 'user', content: message });
+    }
+    
+    // Add AI message to chat
+    function addAiMessage(message) {
+        const aiMessageHTML = `
+            <div class="flex mb-4">
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                        <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10zm0 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 bg-blue-50 p-3 rounded-lg rounded-tl-none max-w-md">
+                    <p class="text-sm text-gray-800">${formatMessage(message)}</p>
+                </div>
+            </div>
+        `;
+        chatContainer.insertAdjacentHTML('beforeend', aiMessageHTML);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // Add to history
+        chatHistory.push({ role: 'assistant', content: message });
+    }
+    
+    // Format message with line breaks and links
+    function formatMessage(text) {
+        // Convert line breaks to <br>
+        let formattedText = escapeHtml(text).replace(/\n/g, '<br>');
+        
+        // Convert URLs to clickable links
+        formattedText = formattedText.replace(
+            /(https?:\/\/[^\s]+)/g, 
+            '<a href="$1" target="_blank" class="text-blue-600 hover:underline">$1</a>'
+        );
+        
+        return formattedText;
+    }
+    
+    // Escape HTML to prevent XSS
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    
+    // Send message to API
+    async function sendMessageToApi(message) {
+        try {
+            const apiConnected = await checkApiConnection();
+            
+            if (!apiConnected) {
+                // Fallback to simulated response if API is not available
+                return simulateAiResponse();
+            }
+            
+            const response = await fetch('http://localhost:1234/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: chatHistory,
+                    max_tokens: 1000
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erro na resposta da API');
+            }
+            
+            const data = await response.json();
+            return data.response || "Desculpe, não consegui processar sua solicitação.";
+            
+        } catch (error) {
+            console.error('Erro ao enviar mensagem para API:', error);
+            return simulateAiResponse();
+        }
+    }
+    
+    // Simulate AI response as fallback
+    function simulateAiResponse() {
+        const fallbackResponses = [
+            "Estou com dificuldade para me conectar ao servidor neste momento. Por favor, tente novamente mais tarde.",
+            "Parece que estamos enfrentando problemas técnicos. Nossa equipe já foi notificada.",
+            "Não foi possível processar sua solicitação devido a um problema de conexão. Tente novamente em alguns instantes.",
+            "Desculpe, não consegui me conectar ao servidor de IA. Estou operando em modo offline com respostas limitadas."
+        ];
+        
+        return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+    }
+    
+    // Send message function
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (message) {
+            // Clear input
+            messageInput.value = '';
+            
+            // Add user message to chat
+            addUserMessage(message);
+            
+            // Show typing indicator
+            addTypingIndicator();
+            
+            // Get response from API
+            const aiResponse = await sendMessageToApi(message);
+            
+            // Remove typing indicator
+            removeTypingIndicator();
+            
+            // Add AI response to chat
+            addAiMessage(aiResponse);
+        }
+    }
+    
+    // Event listeners
     sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
+    messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             sendMessage();
         }
     });
+    
+    // Check connection periodically
+    setInterval(checkApiConnection, 30000);
 </script>
